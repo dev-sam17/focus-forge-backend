@@ -734,6 +734,113 @@ export default {
     }
   },
 
+  // Get today's stats - hours worked and target hours
+  async getTodayStats(userId: string, trackerId?: string) {
+    try {
+      const today = new Date();
+      const startOfDay = new Date(today);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(today);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      // Build where clause conditionally based on trackerId
+      const whereClause: any = {
+        tracker: {
+          userId: userId,
+          archived: false,
+        },
+        startTime: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      };
+
+      // If trackerId is provided, add it to the filter
+      if (trackerId) {
+        whereClause.trackerId = trackerId;
+      }
+
+      // Get all sessions for today
+      const sessions = await prisma.session.findMany({
+        where: whereClause,
+        include: {
+          tracker: {
+            select: {
+              id: true,
+              trackerName: true,
+              targetHours: true,
+              workDays: true,
+            },
+          },
+        },
+      });
+
+      // Calculate total hours worked today
+      const totalMinutesWorked = sessions.reduce((total, session) => {
+        return total + session.durationMinutes;
+      }, 0);
+      const hoursWorked = parseFloat((totalMinutesWorked / 60).toFixed(2));
+
+      // Calculate target hours for today
+      let targetHours = 0;
+      const dayOfWeek = today.getDay();
+
+      if (trackerId) {
+        // For specific tracker
+        const tracker = await prisma.tracker.findUnique({
+          where: { id: trackerId },
+        });
+
+        if (tracker) {
+          const workDays = new Set(tracker.workDays.split(",").map(Number));
+          if (workDays.has(dayOfWeek)) {
+            targetHours = tracker.targetHours;
+          }
+        }
+      } else {
+        // For all active trackers
+        const activeTrackers = await prisma.tracker.findMany({
+          where: { userId, archived: false },
+        });
+
+        for (const tracker of activeTrackers) {
+          const workDays = new Set(tracker.workDays.split(",").map(Number));
+          if (workDays.has(dayOfWeek)) {
+            targetHours += tracker.targetHours;
+          }
+        }
+      }
+
+      targetHours = parseFloat(targetHours.toFixed(2));
+
+      // Calculate progress percentage
+      const progressPercentage =
+        targetHours > 0 ? Math.round((hoursWorked / targetHours) * 100) : 0;
+
+      // Determine if today is a working day
+      const isWorkingDay = targetHours > 0;
+
+      const result = {
+        date: this.getDateStr(today),
+        hoursWorked,
+        targetHours,
+        progressPercentage,
+        isWorkingDay,
+        remainingHours: Math.max(
+          0,
+          parseFloat((targetHours - hoursWorked).toFixed(2))
+        ),
+        sessionCount: sessions.length,
+        status: hoursWorked >= targetHours ? "completed" : "in_progress",
+      };
+
+      return { success: true, data: result };
+    } catch (err) {
+      logger.error(`Error getting today stats: ${(err as Error).message}`);
+      return { success: false, error: (err as Error).message };
+    }
+  },
+
   // Helper function to get date string
   getDateStr(date: Date): string {
     return date.toISOString().split("T")[0];

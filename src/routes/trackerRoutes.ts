@@ -43,6 +43,9 @@ router.get(
   trackerController.getProductivityTrendForPeriod
 );
 
+// Today stats route
+router.get("/users/:userId/today", trackerController.getTodayStats);
+
 router.post("/webhook", handleWebhook);
 
 export default router;

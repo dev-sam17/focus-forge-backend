@@ -524,6 +524,30 @@ const trackerController = {
       res.status(500).json({ error: "Internal server error" });
     }
   },
+
+  // Get today's stats - hours worked and target hours
+  async getTodayStats(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+      const { trackerId } = req.query;
+
+      const result = await trackerService.getTodayStats(
+        userId,
+        trackerId as string | undefined
+      );
+
+      if (result.success) {
+        res.status(200).json(result);
+        return;
+      } else {
+        res.status(400).json(result);
+        return;
+      }
+    } catch (err) {
+      logger.error(`Error getting today stats: ${(err as Error).message}`);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  },
 };
 
 export default trackerController;
