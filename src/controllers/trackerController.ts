@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import trackerService from "../services/trackerService";
 import logger from "../utils/logger";
+import {
+  invalidateUserCache,
+  invalidateTrackerCache,
+} from "../middleware/cache";
 
 const trackerController = {
   // Add a new tracker
@@ -26,6 +30,8 @@ const trackerController = {
       });
 
       if (result.success) {
+        // Invalidate user cache when new tracker is added
+        await invalidateUserCache(userId);
         res.status(201).json(result);
         return;
       } else {
@@ -79,6 +85,10 @@ const trackerController = {
       const result = await trackerService.stopTracker(trackerId);
 
       if (result.success) {
+        // Invalidate cache for all users since we don't have userId in this context
+        // This is a simple approach - in production you might want to store userId in session/token
+        // const cachePattern = `cache:*:*`;
+        // await invalidateUserCache('*', cachePattern);
         res.status(200).json(result);
         return;
       } else {
