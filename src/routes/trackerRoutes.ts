@@ -1,18 +1,18 @@
 import { Router } from "express";
 import trackerController from "../controllers/trackerController";
 import { handleWebhook } from "../controllers/webhookController";
-import { cacheMiddleware } from "../middleware/cache";
+import { cacheMiddleware, invalidateAllCacheMiddleware } from "../middleware/cache";
 
 const router: Router = Router();
 
 // Tracker routes
 
-router.post("/trackers", trackerController.addTracker);
+router.post("/trackers", invalidateAllCacheMiddleware, trackerController.addTracker);
 router.get("/trackers", trackerController.getAllTrackers);
-router.post("/trackers/:id/start", trackerController.startTracker);
-router.post("/trackers/:id/stop", trackerController.stopTracker);
-router.post("/trackers/:id/archive", trackerController.archiveTracker);
-router.post("/trackers/:id/unarchive", trackerController.unarchiveTracker);
+router.post("/trackers/:id/start", invalidateAllCacheMiddleware, trackerController.startTracker);
+router.post("/trackers/:id/stop", invalidateAllCacheMiddleware, trackerController.stopTracker);
+router.post("/trackers/:id/archive", invalidateAllCacheMiddleware, trackerController.archiveTracker);
+router.post("/trackers/:id/unarchive", invalidateAllCacheMiddleware, trackerController.unarchiveTracker);
 router.delete("/trackers/:id", trackerController.deleteTracker);
 router.get("/trackers/:id/sessions", trackerController.getSessions);
 router.get("/trackers/:id/stats", trackerController.getWorkStats);

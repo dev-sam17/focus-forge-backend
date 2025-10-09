@@ -1,10 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import trackerService from "../services/trackerService";
 import logger from "../utils/logger";
-import {
-  invalidateUserCache,
-  invalidateTrackerCache,
-} from "../middleware/cache";
 
 const trackerController = {
   // Add a new tracker
@@ -30,8 +26,6 @@ const trackerController = {
       });
 
       if (result.success) {
-        // Invalidate user cache when new tracker is added
-        await invalidateUserCache(userId);
         res.status(201).json(result);
         return;
       } else {
@@ -79,7 +73,6 @@ const trackerController = {
           success: false,
           error: "Tracker ID is required",
         });
-        return;
       }
 
       const result = await trackerService.stopTracker(trackerId);

@@ -87,3 +87,29 @@ export const invalidateUserCache = async (userId: string, pattern?: string) => {
 export const invalidateTrackerCache = async (userId: string, trackerId: string) => {
   await invalidateUserCache(userId, `cache:*:${userId}*tracker:${trackerId}*`);
 };
+
+// Middleware to invalidate all cache after POST operations
+export const invalidateAllCacheMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+  // Store original res.json method
+  const originalJson = res.json.bind(res);
+  
+  // Override res.json to invalidate cache after successful operations
+  res.json = function(data: any) {
+    // Only invalidate cache for successful POST operations
+    if (req.method === 'POST' && data && data.success) {
+      // Invalidate all cache entries
+      redisClient.flushdb()
+        .then(() => {
+          logger.info('All cache invalidated after successful POST operation');
+        })
+        .catch((err) => {
+          logger.error('Failed to invalidate all cache:', err);
+        });
+    }
+    
+    // Call original json method
+    return originalJson(data);
+  };
+
+  next();
+};
