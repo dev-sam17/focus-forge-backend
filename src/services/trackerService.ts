@@ -150,6 +150,36 @@ export default {
     }
   },
 
+  // Edit a tracker
+  async editTracker(trackerId: string, data: {
+    trackerName?: string;
+    targetHours?: number;
+    description?: string;
+    workDays?: string;
+  }) {
+    try {
+      const updateData: any = {};
+      
+      if (data.trackerName !== undefined) updateData.trackerName = data.trackerName;
+      if (data.targetHours !== undefined) updateData.targetHours = data.targetHours;
+      if (data.description !== undefined) updateData.description = data.description;
+      if (data.workDays !== undefined) updateData.workDays = data.workDays;
+      
+      // Always update the updatedAt timestamp
+      updateData.updatedAt = new Date();
+
+      const updatedTracker = await prisma.tracker.update({
+        where: { id: trackerId },
+        data: updateData,
+      });
+
+      return { success: true, data: updatedTracker, message: "Tracker updated successfully" };
+    } catch (err) {
+      logger.error(`Service error editing tracker: ${(err as Error).message}`);
+      return { success: false, error: "Failed to edit tracker" };
+    }
+  },
+
   // Delete a tracker
   async deleteTracker(trackerId: string) {
     try {

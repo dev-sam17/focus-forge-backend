@@ -13,6 +13,7 @@ router.post("/trackers/:id/start", invalidateAllCacheMiddleware, trackerControll
 router.post("/trackers/:id/stop", invalidateAllCacheMiddleware, trackerController.stopTracker);
 router.post("/trackers/:id/archive", invalidateAllCacheMiddleware, trackerController.archiveTracker);
 router.post("/trackers/:id/unarchive", invalidateAllCacheMiddleware, trackerController.unarchiveTracker);
+router.put("/trackers/:id/edit", invalidateAllCacheMiddleware, trackerController.editTracker);
 router.delete("/trackers/:id", trackerController.deleteTracker);
 router.get("/trackers/:id/sessions", trackerController.getSessions);
 router.get("/trackers/:id/stats", trackerController.getWorkStats);

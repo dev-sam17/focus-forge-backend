@@ -153,6 +153,64 @@ const trackerController = {
     }
   },
 
+  // Edit a tracker
+  async editTracker(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { trackerName, targetHours, description, workDays } = req.body;
+
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: "Tracker ID is required",
+        });
+        return;
+      }
+
+      // Validate targetHours if provided
+      if (targetHours !== undefined && (isNaN(parseInt(targetHours, 10)) || parseInt(targetHours, 10) <= 0)) {
+        res.status(400).json({
+          success: false,
+          error: "Target hours must be a positive number",
+        });
+        return;
+      }
+
+      const updateData: any = {};
+      if (trackerName !== undefined) updateData.trackerName = trackerName;
+      if (targetHours !== undefined) updateData.targetHours = parseInt(targetHours, 10);
+      if (description !== undefined) updateData.description = description;
+      if (workDays !== undefined) updateData.workDays = workDays;
+
+      // Check if at least one field is being updated
+      if (Object.keys(updateData).length === 0) {
+        res.status(400).json({
+          success: false,
+          error: "At least one field must be provided for update",
+        });
+        return;
+      }
+
+      const result = await trackerService.editTracker(id, updateData);
+
+      if (result.success) {
+        res.status(200).json(result);
+        return;
+      } else {
+        res.status(400).json(result);
+        return;
+      }
+    } catch (err) {
+      logger.error(
+        `Controller error editing tracker: ${(err as Error).message}`
+      );
+      res.status(500).json({
+        success: false,
+        error: "Internal server error",
+      });
+    }
+  },
+
   // Delete a tracker
   async deleteTracker(req: Request, res: Response) {
     try {
