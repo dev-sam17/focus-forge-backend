@@ -7,14 +7,11 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY prisma ./prisma
 
 # Install all dependencies (including devDependencies for build)
 RUN pnpm install --frozen-lockfile
-
-# Copy prisma files and generate client
-COPY prisma ./prisma
-RUN pnpm prisma generate
 
 # Copy source code
 COPY tsconfig.json ./
@@ -32,14 +29,11 @@ WORKDIR /app
 RUN npm install -g pnpm
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY prisma ./prisma
 
 # Install only production dependencies
 RUN pnpm install --prod --frozen-lockfile
-
-# Copy prisma files and generate client
-COPY prisma ./prisma
-RUN pnpm prisma generate
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
