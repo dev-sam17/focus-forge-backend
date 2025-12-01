@@ -1,10 +1,6 @@
-version: '3.8'
-
 services:
-  api:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  backend:
+    image: ghcr.io/dev-sam17/focus-forge-backend:${BACKEND_TAG:-latest}
     env_file:
       - .env.production
     ports:
