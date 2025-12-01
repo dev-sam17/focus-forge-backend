@@ -33,7 +33,7 @@ model Tracker {
   id            String         @id @default(cuid())
   userId        String
   trackerName   String
-  targetHours   Int
+  targetHours   Decimal        @db.Decimal(5, 2) // Supports up to 999.99 hours with 2 decimal places
   archived      Boolean        @default(false)
   description   String         @default("")
   workDays      String         @default("1,2,3,4,5") // Default Mon-Fri (0=Sun, 1=Mon, ..., 6=Sat)

@@ -20,7 +20,7 @@ const trackerController = {
       const result = await trackerService.addTracker({
         userId: userId,
         trackerName,
-        targetHours: parseInt(targetHours, 10),
+        targetHours: parseFloat(targetHours),
         description: description || "",
         workDays,
       });
@@ -168,7 +168,10 @@ const trackerController = {
       }
 
       // Validate targetHours if provided
-      if (targetHours !== undefined && (isNaN(parseInt(targetHours, 10)) || parseInt(targetHours, 10) <= 0)) {
+      if (
+        targetHours !== undefined &&
+        (isNaN(parseFloat(targetHours)) || parseFloat(targetHours) <= 0)
+      ) {
         res.status(400).json({
           success: false,
           error: "Target hours must be a positive number",
@@ -178,7 +181,8 @@ const trackerController = {
 
       const updateData: any = {};
       if (trackerName !== undefined) updateData.trackerName = trackerName;
-      if (targetHours !== undefined) updateData.targetHours = parseInt(targetHours, 10);
+      if (targetHours !== undefined)
+        updateData.targetHours = parseFloat(targetHours);
       if (description !== undefined) updateData.description = description;
       if (workDays !== undefined) updateData.workDays = workDays;
 
