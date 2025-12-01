@@ -151,20 +151,26 @@ export default {
   },
 
   // Edit a tracker
-  async editTracker(trackerId: string, data: {
-    trackerName?: string;
-    targetHours?: number;
-    description?: string;
-    workDays?: string;
-  }) {
+  async editTracker(
+    trackerId: string,
+    data: {
+      trackerName?: string;
+      targetHours?: number;
+      description?: string;
+      workDays?: string;
+    }
+  ) {
     try {
       const updateData: any = {};
-      
-      if (data.trackerName !== undefined) updateData.trackerName = data.trackerName;
-      if (data.targetHours !== undefined) updateData.targetHours = data.targetHours;
-      if (data.description !== undefined) updateData.description = data.description;
+
+      if (data.trackerName !== undefined)
+        updateData.trackerName = data.trackerName;
+      if (data.targetHours !== undefined)
+        updateData.targetHours = data.targetHours;
+      if (data.description !== undefined)
+        updateData.description = data.description;
       if (data.workDays !== undefined) updateData.workDays = data.workDays;
-      
+
       // Always update the updatedAt timestamp
       updateData.updatedAt = new Date();
 
@@ -173,7 +179,11 @@ export default {
         data: updateData,
       });
 
-      return { success: true, data: updatedTracker, message: "Tracker updated successfully" };
+      return {
+        success: true,
+        data: updatedTracker,
+        message: "Tracker updated successfully",
+      };
     } catch (err) {
       logger.error(`Service error editing tracker: ${(err as Error).message}`);
       return { success: false, error: "Failed to edit tracker" };
@@ -323,7 +333,7 @@ export default {
         }
       }
 
-      const targetWorkHours = totalWorkDays * tracker.targetHours;
+      const targetWorkHours = totalWorkDays * Number(tracker.targetHours);
       let workDebt = 0;
       let workAdvance = 0;
 
@@ -516,7 +526,7 @@ export default {
             currentDate.setDate(currentDate.getDate() + 1);
           }
 
-          totalTargetHours = workDaysCount * tracker.targetHours;
+          totalTargetHours = workDaysCount * Number(tracker.targetHours);
         }
       } else {
         // Get all active trackers for the user
@@ -537,7 +547,7 @@ export default {
             currentDate.setDate(currentDate.getDate() + 1);
           }
 
-          totalTargetHours += workDaysCount * tracker.targetHours;
+          totalTargetHours += workDaysCount * Number(tracker.targetHours);
         }
       }
 
@@ -688,7 +698,7 @@ export default {
             const workDays = new Set(tracker.workDays.split(",").map(Number));
             if (workDays.has(dayOfWeek)) {
               isWorkingDay = true;
-              totalTargetHours = tracker.targetHours;
+              totalTargetHours = Number(tracker.targetHours);
               totalHoursWorked = (dailyTotals[dateStr] || 0) / 60; // Convert minutes to hours
             }
           }
@@ -698,7 +708,7 @@ export default {
             const workDays = new Set(tracker.workDays.split(",").map(Number));
             if (workDays.has(dayOfWeek)) {
               isWorkingDay = true;
-              totalTargetHours += tracker.targetHours;
+              totalTargetHours += Number(tracker.targetHours);
             }
           }
           if (isWorkingDay) {
@@ -824,7 +834,7 @@ export default {
         if (tracker) {
           const workDays = new Set(tracker.workDays.split(",").map(Number));
           if (workDays.has(dayOfWeek)) {
-            targetHours = tracker.targetHours;
+            targetHours = Number(tracker.targetHours);
           }
         }
       } else {
@@ -836,7 +846,7 @@ export default {
         for (const tracker of activeTrackers) {
           const workDays = new Set(tracker.workDays.split(",").map(Number));
           if (workDays.has(dayOfWeek)) {
-            targetHours += tracker.targetHours;
+            targetHours += Number(tracker.targetHours);
           }
         }
       }
