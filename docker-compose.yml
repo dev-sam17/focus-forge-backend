@@ -1,6 +1,7 @@
 services:
   backend:
     image: ghcr.io/dev-sam17/focus-forge-backend:${BACKEND_TAG:-latest}
+    container_name: focus-forge-backend
     env_file:
       - .env.production
     ports:
