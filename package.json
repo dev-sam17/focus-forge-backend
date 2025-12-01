@@ -1,12 +1,13 @@
 {
-  "name": "time-tracker-backend",
+  "name": "focus-forge-backend",
   "version": "1.0.0",
-  "description": "Backend server for Time Tracker application",
+  "description": "Backend server for Focus Forge application",
   "main": "dist/index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "dev": "cross-env NODE_ENV=development nodemon --exec ts-node src/index.ts",
     "build": "tsc",
+    "postinstall": "prisma generate",
     "lint": "eslint .",
     "test": "jest"
   },
