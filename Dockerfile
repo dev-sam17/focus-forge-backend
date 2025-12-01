@@ -36,7 +36,7 @@ RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /prisma ./prisma
+COPY --from=builder /app/prisma ./prisma
 
 # Set environment
 ENV NODE_ENV=production
